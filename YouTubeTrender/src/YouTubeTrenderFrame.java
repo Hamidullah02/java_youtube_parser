@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,6 +78,7 @@ public class YouTubeTrenderFrame extends JFrame {
         jTextFieldDataFile.setPreferredSize(new Dimension(200, 25));
         jTextFieldDataFile.setText("data/youtubedata_15_50.json");
         JButton jButtonParse = new JButton("Load");
+
 
         topPanel.add(Box.createRigidArea(frmWDim));
         topPanel.add(jTextFieldDataFile);
