@@ -76,8 +76,26 @@ public class YouTubeTrenderFrame extends JFrame {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         jTextFieldDataFile = new JTextField();
         jTextFieldDataFile.setPreferredSize(new Dimension(200, 25));
-        jTextFieldDataFile.setText("data/youtubedata_15_50.json");
+        jTextFieldDataFile.setText("YouTubeTrender/data/youtubedata_15_50.json");
         JButton jButtonParse = new JButton("Load");
+
+        jButtonParse.addActionListener(e -> {
+            String filename = jTextFieldDataFile.getText();
+            YouTubeDataParser parser = new YouTubeDataParser();
+            try {
+                List<YouTubeVideo> videos = parser.parse(filename);
+                System.out.println("Loaded videos: " + videos.size());
+
+                jListVideos.setListData(videos.toArray(new YouTubeVideo[0]));
+
+//                for (YouTubeVideo video : videos) {
+//                    System.out.println(video);
+//                }
+            } catch (YouTubeDataParserException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error loading file: " + ex.getMessage());
+            }
+        });
 
 
         topPanel.add(Box.createRigidArea(frmWDim));
@@ -89,12 +107,27 @@ public class YouTubeTrenderFrame extends JFrame {
         return topPanel;
     }
 
+    private JList<YouTubeVideo> jListVideos;
     private JPanel createVideoPanel() {
         JPanel videoPanel = new JPanel();
         videoPanel.setPreferredSize(new Dimension(525, 240));
         videoPanel.setBorder(BorderFactory.createTitledBorder("Videos"));
-        JScrollPane jScrollPaneListVideo = new JScrollPane();
+        jListVideos = new JList<>();
+        JScrollPane jScrollPaneListVideo = new JScrollPane(jListVideos);
         jScrollPaneListVideo.setPreferredSize(new Dimension(500, 200));
+
+        jListVideos.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                YouTubeVideo video = jListVideos.getSelectedValue();
+                if (video != null) {
+                    jTextFieldChannel.setText(video.getChannel());
+                    jTextFieldTitle.setText(video.getTitle());
+                    jTextFieldDate.setText(video.getDate());
+                    jTextFieldViewCount.setText(String.valueOf(video.getViewCount()));
+                    jTextAreaVideoDescription.setText(video.getDescription());
+                }
+            }
+        });
 
         videoPanel.add(jScrollPaneListVideo);
         return videoPanel;
