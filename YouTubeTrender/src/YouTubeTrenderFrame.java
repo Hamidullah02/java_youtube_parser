@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.awt.event.ActionListener;
+
 
 
 public class YouTubeTrenderFrame extends JFrame {
@@ -59,7 +61,10 @@ public class YouTubeTrenderFrame extends JFrame {
         jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(createTopPanel());
         jPanelContainer.add(Box.createRigidArea(frmHDim));
+        jPanelContainer.add(createSortPanel());
+        jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(createVideoPanel());
+
         jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(createVideoDetailsPanel());
@@ -78,7 +83,6 @@ public class YouTubeTrenderFrame extends JFrame {
         jTextFieldDataFile.setPreferredSize(new Dimension(200, 25));
         jTextFieldDataFile.setText("YouTubeTrender/data/youtubedata_15_50.json");
         JButton jButtonParse = new JButton("Load");
-
         jButtonParse.addActionListener(e -> {
             String filename = jTextFieldDataFile.getText();
             YouTubeDataParser parser = new YouTubeDataParser();
@@ -104,8 +108,58 @@ public class YouTubeTrenderFrame extends JFrame {
         topPanel.add(jButtonParse);
         topPanel.add(Box.createRigidArea(frmWDim));
 
-        return topPanel;
+             return topPanel;
     }
+
+    private JCheckBox cbChannel, cbDescription, cbDate, cbViews;
+    private JPanel createSortPanel() {
+        JPanel sortPanel = new JPanel();
+        sortPanel.setPreferredSize(new Dimension(525, 60));
+        sortPanel.setBorder(BorderFactory.createTitledBorder("Sort Criteria"));
+        sortPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 5));
+
+        cbChannel = new JCheckBox("Channel");
+        cbDate = new JCheckBox("Date");
+        cbViews = new JCheckBox("Views");
+        cbDescription = new JCheckBox("Description");
+
+
+        ButtonGroup sortGroup = new ButtonGroup();
+        sortGroup.add(cbChannel);
+        sortGroup.add(cbDescription);
+        sortGroup.add(cbDate);
+        sortGroup.add(cbViews);
+
+        sortPanel.add(cbChannel);
+        sortPanel.add(cbDescription);
+        sortPanel.add(cbDate);
+        sortPanel.add(cbViews);
+
+        ActionListener sortListener = e -> {
+            if (jListVideos.getModel().getSize() == 0) return;
+
+            List<YouTubeVideo> videos = new ArrayList<>();
+            for (int i = 0; i < jListVideos.getModel().getSize(); i++) {
+                videos.add(jListVideos.getModel().getElementAt(i));
+            }
+
+            if (cbChannel.isSelected()) videos.sort(YouTubeVideo.BY_CHANNEL);
+            else if (cbDescription.isSelected()) videos.sort(YouTubeVideo.BY_DESLENGTH);
+            else if (cbDate.isSelected()) videos.sort(YouTubeVideo.BY_DATE);
+            else if (cbViews.isSelected()) videos.sort(YouTubeVideo.BY_VIEWS.reversed());
+
+            jListVideos.setListData(videos.toArray(new YouTubeVideo[0]));
+        };
+
+        cbChannel.addActionListener(sortListener);
+        cbDescription.addActionListener(sortListener);
+        cbDate.addActionListener(sortListener);
+        cbViews.addActionListener(sortListener);
+
+        return sortPanel;
+    }
+
+
 
     private JList<YouTubeVideo> jListVideos;
     private JPanel createVideoPanel() {

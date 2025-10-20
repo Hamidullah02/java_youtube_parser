@@ -4,6 +4,7 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 /**
  * YouTubeTrender class
@@ -13,7 +14,7 @@ public class YouTubeTrender {
     public static void test1() throws FileNotFoundException {
 
         System.out.println("Performing Test 1");
-        String filename = "data/youtubedata_15_50.json";
+        String filename = "YouTubeTrender/data/youtubedata_15_50.json";
 
         // TODO: try the filename below instead and compare output
         // String filename = "data/youtubedata_malformed.json";
@@ -36,11 +37,21 @@ public class YouTubeTrender {
 
     public static void test2() {
         System.out.println("Performing Test 2");
-        String filename = "data/youtubedata_15_50.json";
+        String filename = "YouTubeTrender/data/youtubedata_15_50.json";
         int expectedSize = 50;
 
         System.out.println("Testing the file: " + filename);
         System.out.println("Expecting size of: " + expectedSize);
+
+        try{
+            YouTubeDataParser parser = new YouTubeDataParser();
+            List<YouTubeVideo> list =parser.parse(filename);
+            System.out.println("found size: " +list.size());
+            System.out.println("Success: " + ( expectedSize == list.size()));
+
+        }catch (YouTubeDataParserException e) {
+            System.out.println("Parser failed with exception: " + e.getMessage());
+        }
 
         // TODO: implement the remainder of this test
         // YouTubeDataParser parser = new YouTubeDataParser();
@@ -48,6 +59,9 @@ public class YouTubeTrender {
         // System.out.println("Found size: " + list.size());
 
     }
+
+
+
 
     /**
      * @param args the command line arguments

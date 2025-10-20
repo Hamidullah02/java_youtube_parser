@@ -1,9 +1,11 @@
+import java.util.Comparator;
+
 public class YouTubeVideo {
-    private String channel;
-    private String title;
-    private String description;
-    private String date;
-    private long viewcount;
+    private final String channel;
+    private final String title;
+    private final String description;
+    private final String date;
+    private final long viewcount;
 
     public YouTubeVideo(String channel, String title, String description, String date, long viewcount){
         this.channel = channel;
@@ -21,6 +23,11 @@ public class YouTubeVideo {
     public String getDescription() {
         return description;
     }
+
+    public int getDeslen() {
+        return description.length();
+    }
+
     public String getDate() {
         return date;
     }
@@ -29,6 +36,19 @@ public class YouTubeVideo {
     }
     @Override
     public String toString() {
-        return channel + " | " + title + " | " + viewcount;
+        return title;
     }
+
+
+    public static final Comparator<YouTubeVideo> BY_CHANNEL =
+            Comparator.comparing(YouTubeVideo::getChannel, String.CASE_INSENSITIVE_ORDER);
+
+    public static final Comparator<YouTubeVideo> BY_DESLENGTH =
+            Comparator.comparing(YouTubeVideo::getDeslen);
+
+    public static final Comparator<YouTubeVideo> BY_DATE =
+            Comparator.comparing(YouTubeVideo::getDate);
+
+    public static final Comparator<YouTubeVideo> BY_VIEWS =
+            Comparator.comparingLong(YouTubeVideo::getViewCount);
 }
