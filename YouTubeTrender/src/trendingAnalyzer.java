@@ -20,6 +20,9 @@ public class trendingAnalyzer {
             }
         }
     }
+    public WordIndex getWord(String word) {
+        return wordMap.get(word);
+    }
 
     public WordIndex getMostUsedWord() {
         return wordMap.values().stream()

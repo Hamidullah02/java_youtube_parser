@@ -23,7 +23,6 @@ public class YouTubeVideo {
     public String getDescription() {
         return description;
     }
-
     public int getDeslen() {
         return description.length();
     }
@@ -39,7 +38,6 @@ public class YouTubeVideo {
         return title;
     }
 
-
     public static final Comparator<YouTubeVideo> BY_CHANNEL =
             Comparator.comparing(YouTubeVideo::getChannel, String.CASE_INSENSITIVE_ORDER);
 
@@ -47,7 +45,7 @@ public class YouTubeVideo {
             Comparator.comparing(YouTubeVideo::getDeslen);
 
     public static final Comparator<YouTubeVideo> BY_DATE =
-            Comparator.comparing(YouTubeVideo::getDate);
+            Comparator.comparing(YouTubeVideo::getDate).reversed();
 
     public static final Comparator<YouTubeVideo> BY_VIEWS =
             Comparator.comparingLong(YouTubeVideo::getViewCount);

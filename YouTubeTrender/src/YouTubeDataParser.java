@@ -25,7 +25,6 @@ public class YouTubeDataParser {
                 String description = snippet.getString("description", "");
                 String date = snippet.getString("publishedAt", "");
 
-                // statistics object
                 JsonObject stats = item.getJsonObject("statistics");
                 long viewCount = 0;
                 if (stats != null && stats.containsKey("viewCount")) {

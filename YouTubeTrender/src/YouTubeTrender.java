@@ -2,6 +2,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -43,13 +44,13 @@ public class YouTubeTrender {
         System.out.println("Testing the file: " + filename);
         System.out.println("Expecting size of: " + expectedSize);
 
-        try{
+        try {
             YouTubeDataParser parser = new YouTubeDataParser();
-            List<YouTubeVideo> list =parser.parse(filename);
-            System.out.println("found size: " +list.size());
-            System.out.println("Success: " + ( expectedSize == list.size()));
+            List<YouTubeVideo> list = parser.parse(filename);
+            System.out.println("found size: " + list.size());
+            System.out.println("Success: " + (expectedSize == list.size()));
 
-        }catch (YouTubeDataParserException e) {
+        } catch (YouTubeDataParserException e) {
             System.out.println("Parser failed with exception: " + e.getMessage());
         }
 
@@ -81,7 +82,6 @@ public class YouTubeTrender {
     }
 
 
-
     public static void test4() {
         System.out.println("Performing Test 4: Sorting logic");
 
@@ -91,29 +91,93 @@ public class YouTubeTrender {
         try {
             List<YouTubeVideo> videos = parser.parse(filename);
 
-            // Test sort by Channel
             videos.sort(YouTubeVideo.BY_CHANNEL);
-            System.out.println("Sorted by Channel: " + videos.get(0).getChannel());
+            boolean sorted = true;
+            for (int i = 0; i < videos.size() - 1; i++) {
+                String c1 = videos.get(i).getChannel();
+                String c2 = videos.get(i + 1).getChannel();
+                if (c1.compareToIgnoreCase(c2) > 0) {
+                    System.out.println("Out of order: " + c1 + " > " + c2);
+                    sorted = false;
+                    break;
+                }
+            }
+            System.out.println("Sorted by Channel: " + sorted);
 
-            // Test sort by Title
+
             videos.sort(YouTubeVideo.BY_DESLENGTH);
-            System.out.println("Sorted by Title: " + videos.get(0).getTitle());
+            boolean descSorted = true;
+            for (int i = 0; i < videos.size() - 1; i++) {
+                if (videos.get(i).getDescription().length() > videos.get(i + 1).getDescription().length()) {
+                    descSorted = false;
+                    break;
+                }
+            }
+            System.out.println("Sorted by Description Length: " + descSorted);
 
-            // Test sort by Date
-            videos.sort(YouTubeVideo.BY_DATE);
-            System.out.println("Sorted by Date: " + videos.get(0).getDate());
-
-            // Test sort by View Count
             videos.sort(YouTubeVideo.BY_VIEWS);
-            System.out.println("Sorted by Views: " + videos.get(0).getViewCount());
+            boolean viewsSorted = true;
+            for (int i = 0; i < videos.size() - 1; i++) {
+                if (videos.get(i).getViewCount() > videos.get(i + 1).getViewCount()) {
+                    viewsSorted = false;
+                    break;
+                }
+            }
+            System.out.println("Sorted by Views (ascending): " + viewsSorted);
 
-            System.out.println("Success: Sorting successful");
+
+            videos.sort(YouTubeVideo.BY_DATE);
+            boolean dateSorted = true;
+            for (int i = 0; i < videos.size() - 1; i++) {
+                if (videos.get(i).getDate().compareTo(videos.get(i + 1).getDate()) < 0) {
+                    dateSorted = false;
+                    break;
+                }
+            }
+            System.out.println("Sorted by Date (descending): " + dateSorted);
+
         } catch (YouTubeDataParserException e) {
             System.out.println("Failed to parse file: " + e.getMessage());
         }
     }
 
+    public static void test5() {
+        System.out.println("Performing Test 5: indextest.json word counts");
+        try {
+            List<YouTubeVideo> videos = new YouTubeDataParser().parse("YouTubeTrender/data/youtubedata_indextest.json");
+            trendingAnalyzer analyzer = new trendingAnalyzer();
+            analyzer.indexVideos(videos);
 
+            System.out.println("ONE: " + analyzer.getWord("ONE").getCount() + " (expected: 1)");
+            System.out.println("FIVE: " + analyzer.getWord("FIVE").getCount() + " (expected: 5)");
+            System.out.println("Most used: " + analyzer.getMostUsedWord().getWord());
+
+        } catch (Exception e) {
+            System.out.println("Failed: " + e.getMessage());
+        }
+    }
+
+
+    public static void test6() {
+        System.out.println("Performing Test 6: Multiple videos");
+        try {
+            List<YouTubeVideo> videos = new YouTubeDataParser().parse("YouTubeTrender/data/youtubedata_loremipsum.json");
+            System.out.println("Videos: " + videos.size() + " (expected: 10)");
+        } catch (Exception e) {
+            System.out.println("Failed: " + e.getMessage());
+        }
+    }
+
+    public static void test7() {
+        System.out.println("Performing Test 7: Basic single video parsing");
+        try {
+            List<YouTubeVideo> videos = new YouTubeDataParser().parse("YouTubeTrender/data/youtubedata.json");
+            System.out.println("Single video parsed: " + (videos.size() == 1));
+            System.out.println("Title: " + videos.get(0).getTitle());
+        } catch (Exception e) {
+            System.out.println("Failed: " + e.getMessage());
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -131,6 +195,9 @@ public class YouTubeTrender {
         test2();
         test3();
         test4();
+        test5();
+        test6();
+        test7();
     }
 
 }
