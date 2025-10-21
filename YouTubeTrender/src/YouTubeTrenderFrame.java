@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.awt.event.ActionListener;
+import javax.swing.border.LineBorder;
+
 
 
 
@@ -63,9 +65,12 @@ public class YouTubeTrenderFrame extends JFrame {
         jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(createSortPanel());
         jPanelContainer.add(Box.createRigidArea(frmHDim));
-        jPanelContainer.add(createVideoPanel());
+        JPanel videoPanelContainer = new JPanel();
+        videoPanelContainer.setLayout(new BoxLayout(videoPanelContainer, BoxLayout.X_AXIS));
+        videoPanelContainer.add(createTrendingWordsPanel());
+        videoPanelContainer.add(createVideoPanel());
+        jPanelContainer.add(videoPanelContainer);
 
-        jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(Box.createRigidArea(frmHDim));
         jPanelContainer.add(createVideoDetailsPanel());
 
@@ -74,14 +79,13 @@ public class YouTubeTrenderFrame extends JFrame {
         pack();
     }
 
-
     private JPanel createTopPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setMaximumSize(new Dimension(550, 25));
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
         jTextFieldDataFile = new JTextField();
         jTextFieldDataFile.setPreferredSize(new Dimension(200, 25));
-        jTextFieldDataFile.setText("YouTubeTrender/data/youtubedata_15_50.json");
+        jTextFieldDataFile.setText("YouTubeTrender/data/youtubedata_1_50.json");
         JButton jButtonParse = new JButton("Load");
         jButtonParse.addActionListener(e -> {
             String filename = jTextFieldDataFile.getText();
@@ -150,7 +154,6 @@ public class YouTubeTrenderFrame extends JFrame {
 
             jListVideos.setListData(videos.toArray(new YouTubeVideo[0]));
         };
-
         cbChannel.addActionListener(sortListener);
         cbDescription.addActionListener(sortListener);
         cbDate.addActionListener(sortListener);
@@ -186,6 +189,57 @@ public class YouTubeTrenderFrame extends JFrame {
         videoPanel.add(jScrollPaneListVideo);
         return videoPanel;
     }
+
+    private JPanel createTrendingWordsPanel() {
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(200, 140));
+        panel.setBorder(BorderFactory.createTitledBorder("Trending Words"));
+        panel.setLayout(new BorderLayout());
+
+        JButton btnIndexWords = new JButton("Index Words");
+        btnIndexWords.setPreferredSize(new Dimension(100, 20));
+        btnIndexWords.setBorder(new LineBorder(Color.BLACK, 1, true));
+        JPanel btnPanel = new JPanel();
+        btnPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 5));
+        btnPanel.add(btnIndexWords);
+        panel.add(btnPanel, BorderLayout.NORTH);
+
+        JList<String> jListTrendingWords = new JList<>();
+        JScrollPane scroll = new JScrollPane(jListTrendingWords);
+        panel.add(scroll, BorderLayout.CENTER);
+
+        btnIndexWords.addActionListener(e -> {
+            ListModel<YouTubeVideo> model = jListVideos.getModel();
+            if (model.getSize() == 0) return;
+
+            List<YouTubeVideo> videos = new ArrayList<>();
+            for (int i = 0; i < model.getSize(); i++) {
+                videos.add(model.getElementAt(i));
+            }
+
+            trendingAnalyzer analyzer = new trendingAnalyzer();
+            analyzer.indexVideos(videos);
+
+            List<WordIndex> sortedWords = analyzer.getWordsSortedByCount();
+
+            String[] display = sortedWords.stream()
+                    .map(w -> w.getWord() + " (" + w.getCount() + ")")
+                    .toArray(String[]::new);
+
+            jListTrendingWords.setListData(display);
+
+            WordIndex topWord = analyzer.getMostUsedWord();
+            if (topWord != null) {
+                System.out.println("Most used word: " + topWord.getWord() + " (" + topWord.getCount() + ")");
+            }
+        });
+
+        return panel;
+    }
+
+
+
+
 
     private JPanel createVideoDetailsPanel() {
         JPanel detailsPanel = new JPanel();
